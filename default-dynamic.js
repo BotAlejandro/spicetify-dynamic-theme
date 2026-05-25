@@ -332,28 +332,33 @@ function pickCoverColor() {
     if (!img.complete) return setTimeout(pickCoverColor, 250); // Check if image is loaded
 
     textColor = "#1db954";
-    if (Spicetify.Platform.PlatformData.client_version_triple >= "1.2.48" && img.src.startsWith("https://i.scdn.co/image")) {
-        var imgCORS = new Image();
-        imgCORS.crossOrigin = "anonymous"; // Enable CORS
-        imgCORS.src = Spicetify.Player.data.item.metadata.image_url.replace("spotify:image:", "https://i.scdn.co/image/");
 
-        imgCORS.onload = function () {
-            var canvas = document.createElement("canvas");
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(imgCORS, 0, 0);
+    // Spotify can display the cover art while still making the existing
+    // image element unusable for canvas-based color extraction due to CORS.
+    // Load a fresh CORS-enabled image from metadata instead of using the
+    // already-rendered Spotify image element.
+    const rawSrc = Spicetify.Player.data.item.metadata.image_url || img.src;
+    if (!rawSrc) return;
 
-            getVibrant(imgCORS);
-            imgCORS = null;
-            updateColors(textColor);
-        };
-        return;
-    } else {
-        if (!img.src.startsWith("spotify:")) return;
-    }
+    const src = rawSrc.replace("spotify:image:", "https://i.scdn.co/image/");
 
-    if (img.complete) getVibrant(img);
-    updateColors(textColor);
+    var imgCORS = new Image();
+    imgCORS.crossOrigin = "anonymous"; // Enable CORS
+
+    imgCORS.onload = function () {
+        getVibrant(imgCORS);
+        imgCORS = null;
+        updateColors(textColor);
+    };
+
+    imgCORS.onerror = function (err) {
+        console.error("Dynamic theme failed to load cover art for color extraction:", err);
+    };
+
+    imgCORS.src = src;
 }
+
+
 
 Spicetify.Player.addEventListener("songchange", songchange);
 songchange();
