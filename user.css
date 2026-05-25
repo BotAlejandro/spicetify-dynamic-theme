@@ -32,9 +32,12 @@ h1,
     color: var(--spice-subtext) !important;
 }
 
-/* Improve Topbar background colour */
+/* Remove Topbar background colour */
 .main-topBar-background {
-    --background-base: var(--spice-button-disabled) !important;
+    --background-base: transparent !important;
+}
+.main-topBar-overlay {
+    background-color: var(--spice-main);
 }
 
 .main-entityHeader-shadow,
@@ -94,17 +97,18 @@ img.main-devicePicker-nowPlayingActiveIcon,
     left: 0;
     right: 0;
     bottom: 0;
-    filter: blur(50px) contrast(3) saturate(1.5);
+    filter: blur(10px);
     pointer-events: none;
     backface-visibility: hidden;
     transition: background-image linear 0.35s;
-    opacity: calc(var(--is_light) * 0.05 + 0.12);
-    width: 150%;
+    opacity: calc(var(--is_light) * 0.05 + 0.2);
+    z-index: 2;
+    width: 200%;
     border-radius: 40%;
 }
 
 /* Animate background if option is on */
-@container style(--spice-animation: #010101) {
+/* @container style(--spice-animation: #010101) {
     #main::before,
     .Root__top-container::before {
         will-change: transform;
@@ -117,7 +121,7 @@ img.main-devicePicker-nowPlayingActiveIcon,
     .Root__top-container::before {
         animation-delay: 10s;
     }
-}
+} */
 
 #main::before {
     translate: -35%;
@@ -156,13 +160,6 @@ img.main-devicePicker-nowPlayingActiveIcon,
 .main-nowPlayingView-sectionHeaderSpacing .main-nowPlayingView-lyricsTitle {
     color: var(--spice-text);
     min-height: 32px;
-}
-
-/* explicit lyrics icon */
-.main-trackList-rowBadges > span,
-.main-tag-container {
-    color: var(--spice-subtext);
-    background-color: rgba(var(--spice-rgb-subtext), 0.2) !important;
 }
 
 /* album year info */
@@ -265,16 +262,10 @@ img.main-devicePicker-nowPlayingActiveIcon,
     background: none !important;
 }
 
-/* Hide banners and gradients */
-.main-entityHeader-background.main-entityHeader-overlay,
-.main-entityHeader-background.main-entityHeader-gradient {
-    opacity: 0;
-}
-
-.before-scroll-node,
-.main-entityHeader-backgroundColor,
-.main-actionBarBackground-background {
-    display: none;
+/* Tone done gradients */
+.under-main-view,
+[style*="background-color"]:not(.main-shelf-shelfGrid [style*="background-color"]) {
+    opacity: .8;
 }
 
 /* Fix forced subdue */
@@ -305,17 +296,6 @@ img.main-devicePicker-nowPlayingActiveIcon,
     --background-base: rgba(var(--spice-rgb-text), 0.1) !important;
     --background-base-min-contrast: rgba(var(--spice-rgb-text), 0.2) !important;
     --background-base-70: rgba(var(--spice-rgb-text), 0.2) !important;
-}
-
-/* Fix canvas overlay in light mode */
-.main-nowPlayingView-coverArtContainer > div:has(.canvasVideoContainerNPV)::before,
-.main-nowPlayingView-coverArtContainer > div:has(.canvasVideoContainerNPV)::after {
-    background: linear-gradient(180deg, rgba(var(--spice-rgb-main), 63%), rgba(var(--spice-rgb-main), 53%) 30%, rgba(var(--spice-rgb-main), 53%) 70%, var(--spice-main) 95%);
-}
-
-/* Hide Spotify home header */
-div.main-home-homeHeader {
-    display: none !important;
 }
 
 /* smooth color transitions */
@@ -363,4 +343,160 @@ html {
         --spice-subtext 0.5s,
         --spice-button 0.5s,
         --spice-player 0.5s;
+}
+
+
+/* Hide Add to playlist/miniplayer button on now playing */
+button[aria-label="Add to playlist"][aria-checked],
+button[aria-label="Open Miniplayer"]  {
+    display: none !important;
+}
+
+/* Hide fullscreen button */
+#main > div > div.Root__top-container > div.Root__now-playing-bar > aside > div > div.main-nowPlayingBar-right > div > button:nth-child(7) {
+    display: none;
+}
+
+/* Main Player background */
+#main > div > div.Root__top-container > div.Root__main-view{
+    background-color: var(--background-tinted-highlight);
+}
+
+/* Remove border on topbar main player */
+.main-topBar-container {
+    border-radius: 0px !important;
+}
+
+/* Change color of header below topbar */
+#main > div > div.Root__top-container > div.Root__main-view > div.main-view-container > div.main-view-container__scroll-node.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > main > section > div.playlist-playlist-playlistContent > div.main-useDropTarget-base.main-useDropTarget-track.main-useDropTarget-local.main-useDropTarget-episode.main-useDropTarget-album > div > div.Xo8dgIGCCWjHXWBoKhaV > div > div.main-trackList-trackListHeader.main-trackList-trackListHeaderStuck, #main > div > div.Root__top-container > div.Root__main-view > div.main-view-container > div.main-view-container__scroll-node.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > main > div.main-home-filterChipsContainer > div.mjZrvVI3CxfHJXu7y0Lg.fIvMht6B9HdROywMNJZ4.main-home-filterChipsSection, .main-topBar-background, #main > div > div.Root__top-container > div.Root__main-view > div.main-view-container > div.main-view-container__scroll-node.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > main > section > div:nth-child(4) > div.Xo8dgIGCCWjHXWBoKhaV > div > div.main-trackList-trackListHeader.main-trackList-trackListHeaderStuck, .main-home-filterChipsContainer{
+    --background-base: transparent !important;
+    background-color: var(--spice-main) !important;
+}
+
+/* Vertically center album art in now playing bar */
+#main > div > div.Root__top-container > div.Root__now-playing-bar > footer > div > div.main-nowPlayingBar-left > div > div.main-coverSlotCollapsed-container.main-coverSlotCollapsed-navAltContainer > div > div {
+    display: flex;
+    align-items: center;
+}
+
+/* Add border radius to live right sideview */
+#Desktop_PanelContainer_Id{
+    border-radius: 8px;
+}
+
+/* Remove background from right view, scroll, no artist cover */
+.main-nowPlayingView-section, .CvxzmyND_aGd2RR8ZoSr, .Rol5Gmuk1O2tMw7NMtxF, .os-scrollbar-handle {
+    background-color:var(--spice-button);
+}
+
+/* Opacity for artist photo */
+#Desktop_PanelContainer_Id > div > div.cZCuJDjrGA2QMXja_Sua.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > div > div.main-nowPlayingView-section.QR9JmVmX9LYwo62NRtew > button > div > div.Rol5Gmuk1O2tMw7NMtxF.zblh0cP5LieDz0Z7_3g3.vfJEDN5R3Sh1q8XvqC4g{
+    opacity: .8;
+}
+
+/* Live viewer */
+#Desktop_PanelContainer_Id > div > div.cZCuJDjrGA2QMXja_Sua.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > div > div.main-nowPlayingView-nowPlayingWidget > div > div.main-nowPlayingView-coverArtContainer.hjyiWzPtKHn_5kCe9vyg.pUIBQ9cykHKYx2A2ZIPA > div.E08D6ucrHuPJYzzGO7HG{
+    height: 24.75em;
+    overflow: hidden;
+    border-radius: 8px;
+    opacity: .6;
+}
+
+/* explicit lyrics icon */
+.x-explicit-label {
+    color: var(--decorative-base);
+    background-color: var(--spice-button);
+}
+
+/* Live view adjustments */
+.E08D6ucrHuPJYzzGO7HG::before, .E08D6ucrHuPJYzzGO7HG::after{
+    display: none;
+}
+#Desktop_PanelContainer_Id > div > div.cZCuJDjrGA2QMXja_Sua.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > div > div.main-nowPlayingView-nowPlayingWidget > div > div.main-nowPlayingView-coverArtContainer.hjyiWzPtKHn_5kCe9vyg.pUIBQ9cykHKYx2A2ZIPA > div.E08D6ucrHuPJYzzGO7HG {
+    opacity: .4;
+}
+
+/* add more space to right of volume dial */
+.volume-bar__slider-container {
+    margin-right: .5vw;
+}
+
+/* Lyric page reduce margin top */
+.lyrics-lyrics-contentContainer {
+    margin-top: 2vh;
+}
+.lyrics-lyricsContent-provider{
+    display: none;
+}
+
+/* Override for queue/nowplaying opacity */
+#queue-panel > div > div > div ul div li div {
+    opacity: 1 !important;
+}
+
+/* Remove 3 dots in queue/tracklist when hovered (same as right click) */
+div.Areas__InteractiveArea-sc-8gfrea-0.Areas__TrailingSlot-sc-8gfrea-7, .main-trackList-rowMoreButton{
+  display: none !important;
+}
+
+/* Changes listRow hover color */
+div[data-encore-id="listRow"] {
+  --box-hover-background-color: rgba(var(--spice-rgb-selected-row), 0.1) !important;
+}
+
+.main-trackList-trackList.main-trackList-indexable[aria-colcount="3"] .main-trackList-trackListRowGrid {
+    grid-template-columns: [index] var(--tracklist-index-column-width,16px) [first] minmax(290px,var(--col1,4fr)) [last] minmax(90px,var(--col2,1fr));
+}
+
+/* Artist page scroll animation*/
+.dhq75ObRGjfBoBlz6clW{
+    display: none;
+}
+.XUwMufC5NCgIyRMyGXLD{
+    opacity: .4;
+}
+
+.Root__now-playing-bar{
+    background-color: unset;
+}
+
+
+#search-dropdown > div {
+    background-color: rgba(var(--spice-rgb-highlight), 0.9) !important;
+}
+
+.main-nowPlayingBar-nowPlayingBar,
+.main-nowPlayingBar-isAnonymous {
+    border-radius: 8px;
+    background-color: rgba(var(--spice-rgb-highlight), 0.9) !important;
+}
+
+/* now playing about artist with no picture background */
+.main-nowPlayingView-section > button,
+.main-nowPlayingView-section > button > div > div:nth-child(2) {
+  background-color: rgba(var(--spice-rgb-highlight), 0.9) !important;
+}
+
+.StyledTabItem-tab-tabItem-useBrowserDefaultFocusStyle:hover{
+    background-color: rgba(var(--spice-rgb-selected-row),.1);
+    border-radius: 8px;
+}
+
+/* canvas header background fix */
+/* .ELBNLm3p55pH7fmnfdh7{
+   position: inherit; 
+  z-index: 10;
+  background-image: none !important;
+} */
+
+button[aria-label="Create"] {
+    background-color: rgba(var(--spice-rgb-selected-row), .1);
+}
+
+[data-testid="track-visual-enhancement"] + div::before {
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 100%
+    ) !important;
 }
