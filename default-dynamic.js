@@ -1,5 +1,3 @@
-let current = "5.7";
-
 function waitForElement(els, func, timeout = 100) {
     const queries = els.map((el) => document.querySelector(el));
     if (queries.every((a) => a)) {
@@ -245,7 +243,7 @@ async function songchange() {
     const album_uri = Spicetify.Player.data.item.metadata.album_uri;
     let bgImage = Spicetify.Player.data.item.metadata.image_url;
     if (!bgImage) {
-        bgImage = "https://cdn.jsdelivr.net/gh/JulienMaille/spicetify-dynamic-theme@main/images/tracklist-row-song-fallback.svg";
+        bgImage = "https://cdn.jsdelivr.net/gh/BotAlejandro/spicetify-dynamic-theme@main/images/tracklist-row-song-fallback.svg";
         textColor = "#1db954";
         updateColors(textColor);
     }
@@ -368,29 +366,6 @@ songchange();
         setTimeout(Startup, 300);
         return;
     }
-    // Check latest release
-    fetch("https://api.github.com/repos/JulienMaille/spicetify-dynamic-theme/releases/latest")
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            if (data.tag_name > current) {
-                const button = document.querySelector("#main-topBar-moon-button");
-                button.classList.remove("main-topBar-buddyFeed");
-                button.classList.add("main-actionButtons-button", "main-noConnection-isNotice");
-                let updateLink = document.createElement("a");
-                updateLink.setAttribute("href", "https://github.com/JulienMaille/spicetify-dynamic-theme/releases/latest");
-                updateLink.innerHTML = `v${data.tag_name} available`;
-                button.append(updateLink);
-                button._tippy.setProps({
-                    allowHTML: true,
-                    content: `Changes: ${data.name}`
-                });
-            }
-        })
-        .catch((err) => {
-            // Do something for an error here
-        });
     Spicetify.showNotification("Applied " + (settingsDark ? "dark" : "light") + " theme.");
 })();
 

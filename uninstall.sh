@@ -2,44 +2,25 @@
 
 set -e
 
-cd "$(dirname "$(spicetify -c)")"
-
-echo "Unpatching (1/3)"
-if cat config-xpui.ini | grep -o '\[Patch\]'; then
-    while true; do
-        read -p "All Spicetify custom patches will be deleted. Is this ok? [y/n] " yn </dev/tty
-        case $yn in
-        [Yy]*) break ;;
-        [Nn]*) exit ;;
-        *) echo "Please answer yes or no." ;;
-        esac
-    done
-    perl -i -0777 -pe "s/\[Patch\].*?($|(\r*\n){2})//s" config-xpui.ini
+if ! command -v spicetify >/dev/null 2>&1; then
+    echo "Spicetify not found. Install Spicetify first, then run this script again." >&2
+    exit 1
 fi
 
-echo "Uninstalling (2/3)"
-cd "$(dirname "$(spicetify -c)")"
-spicetify config current_theme "SpicetifyDefault" color_scheme "green-dark" extensions default-dynamic.js- extensions Vibrant.min.js-
+config_dir="$(dirname "$(spicetify -c)")"
+config_file="${config_dir}/config-xpui.ini"
+theme_dir="${config_dir}/Themes/DefaultDynamic"
+ext_dir="${config_dir}/Extensions"
 
-echo "Deleting (3/3)"
-while true; do
-    read -p "Do you wish to delete theme files? [y/n] " yn </dev/tty
-    case $yn in
-    [Yy]*)
-        theme_dir="$(dirname "$(spicetify -c)")/Themes/DefaultDynamic"
-        ext_dir="$(dirname "$(spicetify -c)")/Extensions"
-        rm -rf "$theme_dir"
-        # Use -f to ignore if missing
-        rm -f "$ext_dir/default-dynamic.js"
-        rm -f "$ext_dir/Vibrant.min.js"
-        break
-        ;;
-    [Nn]*)
-        echo "Skipping deletion."
-        break
-        ;;
-    *) echo "Please answer yes or no." ;;
-    esac
-done
+echo "Unpatching (1/3)"
+perl -0pi -e 's/^\s*xpui\.js_find_8008\s*=.*\R?//mg; s/^\s*xpui\.js_repl_8008\s*=.*\R?//mg;' "${config_file}"
+
+echo "Uninstalling (2/3)"
+spicetify config current_theme SpicetifyDefault color_scheme green-dark extensions default-dynamic.js- extensions Vibrant.min.js-
+
+echo "Deleting files (3/3)"
+rm -rf "${theme_dir}"
+rm -f "${ext_dir}/default-dynamic.js"
+rm -f "${ext_dir}/Vibrant.min.js"
 
 spicetify apply

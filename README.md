@@ -1,64 +1,115 @@
-# DefaultDynamic for [Spicetify](https://github.com/spicetify/cli) <a href="https://github.com/JulienMaille/spicetify-dynamic-theme/releases/latest"><img src="https://img.shields.io/github/release/JulienMaille/spicetify-dynamic-theme/all.svg"></a>
+# Dynamic Theme for Spicetify
 
-This is a tweaked version of the Default theme.  
-The main differences are the automated light/dark toggle, the background cover and the dynamic highlight color, ie. it will match the current album art.
+Dynamic Spicetify theme with album-art color extraction, cover-based backgrounds, light/dark switching, and additional UI cleanup.
 
 ## Preview
 
-![demo-base](./preview.gif)
+![Theme preview](./preview.gif)
+
+## Features
+
+- Dynamic accent colors pulled from the current track artwork
+- Blurred background based on the current cover art
+- Light and dark variants, plus a top-bar toggle button
+- Album or show metadata shown next to the now playing info
+- Extra UI cleanup across headers, gradients, queue, and side panels
+
+## Requirements
+
+- Spotify desktop
+- [Spicetify CLI](https://github.com/spicetify/cli) installed and working
+- A valid Spicetify config directory already created
 
 ## Install / Update
-> [!IMPORTANT]
-> Make sure you are using latest releases of <a href="https://github.com/spicetify/cli/releases/latest"><img src="https://img.shields.io/github/release/spicetify/cli/all.svg?label=Spicetify"></a> and [Spotify](https://www.spotify.com/us/download/other/)  
-> The easiest way is probably to install this theme from the <a href="https://github.com/spicetify/marketplace/wiki/Installation#auto-install"><img src="https://img.shields.io/github/v/release/spicetify/marketplace?label=Marketplace"></a>, developed by the same team behind Spicetify.
 
-#### Windows (PowerShell)
+Re-running the installer updates the existing theme files in place.
+
+### Windows (PowerShell)
 
 ```powershell
-Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/JulienMaille/spicetify-dynamic-theme/master/install.ps1" | Invoke-Expression
+Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/BotAlejandro/spicetify-dynamic-theme/main/install.ps1" | Invoke-Expression
 ```
 
-#### Linux/MacOS (Bash)
+### Linux / macOS (sh)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/JulienMaille/spicetify-dynamic-theme/master/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/BotAlejandro/spicetify-dynamic-theme/main/install.sh | sh
 ```
 
-#### Manual Install
+Both installers do the following:
 
-1. Download the latest [Source code (zip)](https://github.com/JulienMaille/spicetify-dynamic-theme/releases/latest)
-2. Extract the files to your [Spicetify/Themes folder](https://spicetify.app/docs/development/themes/) (rename the zipped folder to `DefaultDynamic`)
-3. Copy `default-dynamic.js` and `Vibrant.min.js` to your [Spicetify/Extensions folder](https://spicetify.app/docs/advanced-usage/extensions#installing)
-4. Run:
-    ```
-    spicetify config extensions default-dynamic.js extensions Vibrant.min.js
-    spicetify config current_theme DefaultDynamic
-    spicetify config color_scheme Dark-Base
-    spicetify config inject_css 1 replace_colors 1
-    spicetify apply
-    ```
+- Copy `color.ini` and `user.css` into `Themes/DefaultDynamic`
+- Copy `default-dynamic.js` and `Vibrant.min.js` into `Extensions`
+- Set `current_theme` to `DefaultDynamic`
+- Set `color_scheme` to `Dark-Base`
+- Enable `inject_css` and `replace_colors`
+- Add the required `xpui.js_find_8008` and `xpui.js_repl_8008` patch entries
 
-## Settings
--   **Theme**: You can choose between `dark` and `light` theme in the Spicetify settings menu.
--   **Animation**: You can toggle the animation on or off by changing the color scheme in the Spicetify settings menu.
+### Manual Install
+
+1. Clone this repo or download the current `main` branch as a zip.
+2. Run `spicetify -c` and open the folder that contains `config-xpui.ini`.
+3. Create `Themes/DefaultDynamic` inside that folder, then copy `color.ini` and `user.css` into it.
+4. Copy `default-dynamic.js` and `Vibrant.min.js` into the `Extensions` folder next to `Themes`.
+5. Add these lines under `[Patch]` in `config-xpui.ini`:
+
+```ini
+xpui.js_find_8008 = ,(\w+=)32,
+xpui.js_repl_8008 = ,${1}28,
+```
+
+If you do not already have a `[Patch]` section, create one first.
+
+6. Run:
+
+```bash
+spicetify config extensions default-dynamic.js extensions Vibrant.min.js
+spicetify config current_theme DefaultDynamic color_scheme Dark-Base
+spicetify config inject_css 1 replace_colors 1
+spicetify apply
+```
+
+`default-dynamic.js` is required. If you only copy the CSS files, the theme will not work correctly.
+
+## Theme Modes
+
+Use Spicetify settings to switch between the included color schemes:
+
+- `Dark-Base`
+- `Light-Base`
+- `Dark-NoAnimation`
+- `Light-NoAnimation`
+
+The top bar also includes a light/dark toggle button.
 
 ## Uninstall
 
-#### Windows (PowerShell)
+### Windows (PowerShell)
 
 ```powershell
-Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/JulienMaille/spicetify-dynamic-theme/master/uninstall.ps1" | Invoke-Expression
+Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/BotAlejandro/spicetify-dynamic-theme/main/uninstall.ps1" | Invoke-Expression
 ```
 
-#### Linux/MacOS (Bash)
+### Linux / macOS (sh)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/JulienMaille/spicetify-dynamic-theme/master/uninstall.sh | sh
+curl -fsSL https://raw.githubusercontent.com/BotAlejandro/spicetify-dynamic-theme/main/uninstall.sh | sh
 ```
 
-#### Manual Uninstall
+### Manual Uninstall
 
-```
-spicetify config current_theme " " color_scheme " " extensions default-dynamic.js- extensions Vibrant.min.js-
+1. Run:
+
+```bash
+spicetify config current_theme SpicetifyDefault color_scheme green-dark extensions default-dynamic.js- extensions Vibrant.min.js-
 spicetify apply
 ```
+
+2. Remove these lines from the `[Patch]` section in `config-xpui.ini`:
+
+```ini
+xpui.js_find_8008 = ,(\w+=)32,
+xpui.js_repl_8008 = ,${1}28,
+```
+
+3. Delete `Themes/DefaultDynamic`, `Extensions/default-dynamic.js`, and `Extensions/Vibrant.min.js`.
