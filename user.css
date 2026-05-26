@@ -370,7 +370,7 @@ button[aria-label="Open Miniplayer"]  {
 /* Change color of header below topbar */
 #main > div > div.Root__top-container > div.Root__main-view > div.main-view-container > div.main-view-container__scroll-node.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > main > section > div.playlist-playlist-playlistContent > div.main-useDropTarget-base.main-useDropTarget-track.main-useDropTarget-local.main-useDropTarget-episode.main-useDropTarget-album > div > div.Xo8dgIGCCWjHXWBoKhaV > div > div.main-trackList-trackListHeader.main-trackList-trackListHeaderStuck, #main > div > div.Root__top-container > div.Root__main-view > div.main-view-container > div.main-view-container__scroll-node.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > main > div.main-home-filterChipsContainer > div.mjZrvVI3CxfHJXu7y0Lg.fIvMht6B9HdROywMNJZ4.main-home-filterChipsSection, .main-topBar-background, #main > div > div.Root__top-container > div.Root__main-view > div.main-view-container > div.main-view-container__scroll-node.ZjfaJlGQZ42nCWjD3FDm > div:nth-child(1) > div > main > section > div:nth-child(4) > div.Xo8dgIGCCWjHXWBoKhaV > div > div.main-trackList-trackListHeader.main-trackList-trackListHeaderStuck, .main-home-filterChipsContainer{
     --background-base: transparent !important;
-    background-color: var(--spice-main) !important;
+    background-color: var(--background-elevated-base) !important;
 }
 
 /* Vertically center album art in now playing bar */
@@ -499,4 +499,8 @@ button[aria-label="Create"] {
         transparent 0%,
         transparent 100%
     ) !important;
+}
+
+.main-home-homeHeader{
+    display: none;
 }
