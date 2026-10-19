@@ -1,4 +1,3 @@
-let current = "5.7";
 const colorCache = new Map();
 const HEX_RE = /^#[0-9a-f]{6}$/i;
 const EXTRACTOR_KEYS = ["VIBRANT", "VIBRANT_NON_ALARMING", "PROMINENT", "LIGHT_VIBRANT", "DESATURATED", "DARK_VIBRANT"];
@@ -122,7 +121,7 @@ function coverToDataURL(httpUrl, trackUri) {
         img.crossOrigin = "anonymous";
         img.onload = function () {
             try {
-                const S = 96;
+                const S = 320; // 96 is too blurry for the static cover background
                 const cv = document.createElement("canvas");
                 cv.width = S;
                 cv.height = S;
@@ -644,7 +643,7 @@ async function songchange(event, retries = 0) {
 
     const album_uri = meta.album_uri;
     const trackUri = dataItem.uri ?? meta.album_uri;
-    const FALLBACK_IMAGE = "https://cdn.jsdelivr.net/gh/JulienMaille/spicetify-dynamic-theme@main/images/tracklist-row-song-fallback.svg";
+    const FALLBACK_IMAGE = "https://cdn.jsdelivr.net/gh/BotAlejandro/spicetify-dynamic-theme@main/images/tracklist-row-song-fallback.svg";
     let bgImageRaw = meta.image_xlarge_url || meta.image_large_url || meta.image_url;
     let bgImage = toHttpCover(bgImageRaw);
     if (!bgImage) {
@@ -980,7 +979,8 @@ async function initDynamicBgKawarp() {
         } catch (_e) {}
     }
 }
-initDynamicBgKawarp();
+// Static cover background from user.css instead of the kawarp warp
+// initDynamicBgKawarp();
 window.__dynamicBgSetCover = function (url) {
     try {
         if (!url) return;
@@ -1009,29 +1009,6 @@ songchange();
         setTimeout(Startup, 300);
         return;
     }
-    // Check latest release
-    fetch("https://api.github.com/repos/JulienMaille/spicetify-dynamic-theme/releases/latest")
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            if (data.tag_name > current) {
-                const button = document.querySelector("#main-topBar-moon-button");
-                button.classList.remove("main-topBar-buddyFeed");
-                button.classList.add("main-actionButtons-button", "main-noConnection-isNotice");
-                let updateLink = document.createElement("a");
-                updateLink.setAttribute("href", "https://github.com/JulienMaille/spicetify-dynamic-theme/releases/latest");
-                updateLink.innerHTML = `v${data.tag_name} available`;
-                button.append(updateLink);
-                button._tippy.setProps({
-                    allowHTML: true,
-                    content: `Changes: ${data.name}`
-                });
-            }
-        })
-        .catch((err) => {
-            // Do something for an error here
-        });
     Spicetify.showNotification("Applied " + (settingsDark ? "dark" : "light") + " theme.");
 })();
 
