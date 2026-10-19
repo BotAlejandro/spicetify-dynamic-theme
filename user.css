@@ -1130,6 +1130,8 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-cover-opacity: calc(var(--is_light) * 0.05 + 0.2);
     --ps-canvas-height: 24.75em;
     --ps-canvas-opacity: 0.4;
+    --ps-npv-header: 64px; /* Spotify's now playing header height */
+    --ps-pin-fade: 32px; /* scroll distance a see-through bar takes to turn solid */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
 }
@@ -1191,6 +1193,43 @@ section[data-testid="artist-page"] > div:has(> button[aria-controls="sort-and-vi
 #main-view > header[data-testid="topbar"] > div:not(.contentSpacing) > div,
 main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style*="--background-base"] {
     display: none;
+}
+
+/* Now playing header over a canvas video: see-through while only the video is under it, solid
+ * by the time the content after the video (title, cards) reaches it. Scroll-driven, so it
+ * follows the real layout instead of a fixed scroll distance. */
+[data-npv-root]:has([data-canvas-surface]) {
+    timeline-scope: --ps-npv-content;
+}
+
+/* the block after the video */
+[data-npv-root] div:has(> div > [data-canvas-surface]) + div {
+    view-timeline: --ps-npv-content block;
+    view-timeline-inset: var(--ps-npv-header) 0;
+}
+
+[data-npv-root]:has([data-canvas-surface]) > div:first-child {
+    background: none !important;
+}
+
+[data-npv-root]:has([data-canvas-surface]) > div:first-child::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--ps-pinned);
+    animation: ps-solid linear both;
+    animation-timeline: --ps-npv-content;
+    animation-range: exit-crossing calc(-1 * var(--ps-pin-fade)) exit-crossing 0%;
+}
+
+@keyframes ps-solid {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /* upstream frosts every filter chip wrapper, which leaves boxes behind the chips */
