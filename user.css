@@ -1134,6 +1134,7 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-pin-fade: 32px; /* scroll distance a see-through bar takes to turn solid */
     --ps-bar-inset: 8px; /* player bar inner gap, same as the gap around the cover */
     --ps-handle: 12px; /* Spotify's slider handle size */
+    --ps-glass-blur: 24px; /* blur behind popups so the page under them doesn't fight the text */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
 }
@@ -1247,7 +1248,15 @@ div[role="presentation"]:has(> div > button[class*="legacy-chip"]) {
     border-radius: var(--ps-radius);
 }
 
-#search-dropdown > div,
+/* Popups over content: card color + blur. The encore menu covers every Spotify menu
+ * (context menus, submenus, sort dropdowns). */
+[data-encore-id="menu"],
+#search-dropdown > div {
+    background-color: var(--ps-card) !important;
+    backdrop-filter: blur(var(--ps-glass-blur));
+    -webkit-backdrop-filter: blur(var(--ps-glass-blur));
+}
+
 #Desktop_PanelContainer_Id section > button /* about the artist without a picture */ {
     background-color: var(--ps-card) !important;
 }
@@ -1273,6 +1282,16 @@ div[role="presentation"]:has(> div > button[class*="legacy-chip"]) {
 /* Hover */
 div[data-encore-id="listRow"] {
     --box-hover-background-color: var(--ps-hover) !important;
+}
+
+/* menu items: Spotify paints its #303030 on the item focused when a menu opens, which shows
+ * up as a gray slab on the glass menu; only highlight hover and keyboard focus */
+[data-encore-id="menuRow"] {
+    background-color: transparent !important;
+}
+
+[data-encore-id="menuRow"]:is([data-hovered], [data-focus-visible]) {
+    background-color: var(--ps-hover) !important;
 }
 
 [data-encore-id="tabItem"]:hover {
