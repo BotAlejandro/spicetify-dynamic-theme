@@ -1171,6 +1171,36 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     background-color: var(--ps-region-tint);
 }
 
+/* Pinned bars: anything that stays put while content scrolls under it. They paint their
+ * region's tint + backdrop, so they look see-through but hide what scrolls under them.
+ * New bar = add a selector here. Lyrics views are left as Spotify draws them: the lyrics
+ * color is painted inside the scroll area, so a bar can't match it without hard-coding. */
+#main-view > header[data-testid="topbar"] > div:not(.contentSpacing), /* topbar */
+[role="grid"] > [data-scroll-size-invariant-class], /* tracklist "# Title" header */
+main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]), /* home/search filter chips */
+section[data-testid="artist-page"] > div:has(> button[aria-controls="sort-and-view-picker"]), /* discography sort bar */
+[data-npv-root] > div:first-child {
+    /* now playing panel header */
+    --ps-pinned: linear-gradient(var(--ps-region-tint, transparent) 0 0), var(--ps-backdrop);
+    background: var(--ps-pinned) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* Spotify's own tint/darken layers inside pinned bars */
+#main-view > header[data-testid="topbar"] > div:not(.contentSpacing) > div,
+main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style*="--background-base"] {
+    display: none;
+}
+
+/* upstream frosts every filter chip wrapper, which leaves boxes behind the chips */
+div[role="presentation"]:has(> button[class*="legacy-chip"]),
+div[role="presentation"]:has(> div > button[class*="legacy-chip"]) {
+    background: none !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
 /* Cards */
 #Desktop_PanelContainer_Id {
     border-radius: var(--ps-radius);
