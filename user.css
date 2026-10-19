@@ -1117,3 +1117,137 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     background-image: none !important;
     box-shadow: none !important;
 }
+
+/* ---------- BotAlejandro style (keep at the bottom so upstream merges stay easy) ---------- */
+
+/* Tokens: change the look here, the rules below only reference these */
+:root {
+    --ps-radius: 8px;
+    --ps-backdrop: var(--spice-main); /* what shows behind every panel */
+    --ps-card: rgba(var(--spice-rgb-highlight), 0.9);
+    --ps-hover: rgba(var(--spice-rgb-selected-row), 0.1);
+    --ps-cover-blur: 10px;
+    --ps-cover-opacity: calc(var(--is_light) * 0.05 + 0.2);
+    --ps-canvas-height: 24.75em;
+    --ps-canvas-opacity: 0.4;
+    --ps-artist-photo-opacity: 0.8;
+    --ps-lyrics-gap: 2vh;
+}
+
+/* background cover: two big blurred copies over the whole window (kawarp is off in default-dynamic.js) */
+#main::before,
+#main::after {
+    content: "";
+    background-image: var(--image_url);
+    background-size: 100%;
+    background-position: center center;
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    filter: blur(var(--ps-cover-blur));
+    pointer-events: none;
+    backface-visibility: hidden;
+    transition: background-image linear 0.35s;
+    opacity: var(--ps-cover-opacity);
+    z-index: 2;
+    width: 200%;
+    border-radius: 40%;
+}
+
+#main::before {
+    translate: -35%;
+}
+
+#main::after {
+    translate: 15%;
+}
+
+/* Regions: a scrolling area sets --ps-region-tint, its own color on top of the backdrop */
+#main-view {
+    --ps-region-tint: var(--background-tinted-highlight);
+    background-color: var(--ps-region-tint);
+}
+
+/* Cards */
+#Desktop_PanelContainer_Id {
+    border-radius: var(--ps-radius);
+}
+
+aside[data-testid="now-playing-bar"] {
+    border-radius: var(--ps-radius);
+    background-color: var(--ps-card) !important;
+}
+
+#search-dropdown > div,
+#Desktop_PanelContainer_Id section > button /* about the artist without a picture */ {
+    background-color: var(--ps-card) !important;
+}
+
+#Desktop_PanelContainer_Id section,
+.os-scrollbar-handle {
+    background-color: var(--spice-button);
+}
+
+/* artist photo */
+#Desktop_PanelContainer_Id section div[style*="background-image"] {
+    opacity: var(--ps-artist-photo-opacity);
+}
+
+/* live canvas video in the right panel */
+[data-canvas-surface] {
+    height: var(--ps-canvas-height);
+    overflow: hidden;
+    border-radius: var(--ps-radius);
+    opacity: var(--ps-canvas-opacity);
+}
+
+/* Hover */
+div[data-encore-id="listRow"] {
+    --box-hover-background-color: var(--ps-hover) !important;
+}
+
+[data-encore-id="tabItem"]:hover {
+    background-color: var(--ps-hover);
+    border-radius: var(--ps-radius);
+}
+
+button[aria-label="Create"] {
+    background-color: var(--ps-hover);
+}
+
+/* Hidden controls: add to playlist, miniplayer, fullscreen, row "..." (same as right click).
+ * Add to playlist / Create have no test id, so they go by the English aria-label. */
+button[aria-label="Add to playlist"][aria-checked],
+[data-testid="pip-toggle-button"],
+[data-testid="fullscreen-mode-button"],
+[role="row"] button[aria-haspopup="menu"] {
+    display: none !important;
+}
+
+/* explicit "E" tag */
+[data-encore-id="tagIcon"] {
+    color: var(--decorative-base) !important;
+    background-color: var(--spice-button) !important;
+}
+
+/* add more space to right of volume dial */
+[data-testid="volume-bar"] {
+    margin-right: 0.5vw;
+}
+
+/* 3 column tracklist: wider title column */
+[role="grid"][aria-colcount="3"] [role="row"] > div {
+    grid-template-columns: [index] var(--tracklist-index-column-width, 16px) [first] minmax(290px, var(--col1, 4fr)) [last] minmax(90px, var(--col2, 1fr));
+}
+
+/* Lyrics: smaller top gap, no "Lyrics provided by" line */
+div[style*="--lyrics-color-active"] > div:has(div[dir="auto"]) {
+    margin-top: var(--ps-lyrics-gap);
+}
+
+div[style*="--lyrics-color-active"] div:not([dir]):has(> p[data-encore-id="text"]) {
+    display: none;
+}
