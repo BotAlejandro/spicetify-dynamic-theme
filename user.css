@@ -1132,6 +1132,8 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-canvas-opacity: 0.4;
     --ps-npv-header: 64px; /* Spotify's now playing header height */
     --ps-pin-fade: 32px; /* scroll distance a see-through bar takes to turn solid */
+    --ps-bar-inset: 8px; /* player bar inner gap, same as the gap around the cover */
+    --ps-handle: 12px; /* Spotify's slider handle size */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
 }
@@ -1245,11 +1247,6 @@ div[role="presentation"]:has(> div > button[class*="legacy-chip"]) {
     border-radius: var(--ps-radius);
 }
 
-aside[data-testid="now-playing-bar"] {
-    border-radius: var(--ps-radius);
-    background-color: var(--ps-card) !important;
-}
-
 #search-dropdown > div,
 #Desktop_PanelContainer_Id section > button /* about the artist without a picture */ {
     background-color: var(--ps-card) !important;
@@ -1287,24 +1284,49 @@ button[aria-label="Create"] {
     background-color: var(--ps-hover);
 }
 
-/* Hidden controls: add to playlist, miniplayer, fullscreen, row "..." (same as right click).
- * Add to playlist / Create have no test id, so they go by the English aria-label. */
-button[aria-label="Add to playlist"][aria-checked],
+/* Hidden controls: save buttons (both states), miniplayer, fullscreen, row "..." (same as right click) */
+[data-testid="now-playing-widget"] button[aria-checked],
+[role="row"] button[aria-checked],
 [data-testid="pip-toggle-button"],
 [data-testid="fullscreen-mode-button"],
 [role="row"] button[aria-haspopup="menu"] {
     display: none !important;
 }
 
+/* Player bar: a card with the same gap on every side as around the cover */
+aside[data-testid="now-playing-bar"] {
+    border-radius: var(--ps-radius);
+    background-color: var(--ps-card) !important;
+}
+
+aside[data-testid="now-playing-bar"] div:has(> div > [data-testid="volume-bar"]) {
+    padding-inline-end: var(--ps-bar-inset);
+}
+
+/* leave room for half the handle so it stays inside the card at full volume */
+[data-testid="volume-bar"] {
+    margin-inline-end: calc(var(--ps-handle) / 2);
+}
+
+/* album • year line (from default-dynamic.js): one quiet line in the third row. It takes the
+ * place of Spotify's quality line ("Lossless"), the bar only has room for three lines. */
+#main-trackInfo-year {
+    white-space: nowrap;
+    color: var(--spice-subtext);
+}
+
+#main-trackInfo-year a {
+    color: inherit;
+}
+
+div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) {
+    display: none;
+}
+
 /* explicit "E" tag */
 [data-encore-id="tagIcon"] {
     color: var(--decorative-base) !important;
     background-color: var(--spice-button) !important;
-}
-
-/* add more space to right of volume dial */
-[data-testid="volume-bar"] {
-    margin-right: 0.5vw;
 }
 
 /* 3 column tracklist: wider title column */
