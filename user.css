@@ -1137,6 +1137,8 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-glass-blur: 24px; /* blur behind popups so the page under them doesn't fight the text */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
+    --ps-lossless-size: 0.6875rem; /* Lossless icon in front of the album name, as tall as the album line's text */
+    --ps-lossless-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='0' y='5' width='2' height='6' rx='1'/%3E%3Crect x='3.5' y='2.5' width='2' height='11' rx='1'/%3E%3Crect x='7' y='0' width='2' height='16' rx='1'/%3E%3Crect x='10.5' y='3.5' width='2' height='9' rx='1'/%3E%3Crect x='14' y='6' width='2' height='4' rx='1'/%3E%3C/svg%3E"); /* sound wave */
 }
 
 /* background cover: two big blurred copies over the whole window (kawarp is off in default-dynamic.js) */
@@ -1336,8 +1338,7 @@ aside[data-testid="now-playing-bar"] div:has(> div > [data-testid="volume-bar"])
     margin-inline-end: calc(var(--ps-handle) / 2);
 }
 
-/* album • year line (from default-dynamic.js): one quiet line in the third row. It takes the
- * place of Spotify's quality line ("Lossless"), the bar only has room for three lines. */
+/* album • year line (from default-dynamic.js): one quiet line under the artist */
 #main-trackInfo-year {
     white-space: nowrap;
     color: var(--spice-subtext);
@@ -1347,8 +1348,33 @@ aside[data-testid="now-playing-bar"] div:has(> div > [data-testid="volume-bar"])
     color: inherit;
 }
 
+/* Lossless: Spotify's quality line would be a 4th line, so it shares the album line's row and its
+ * button is drawn as an icon in front of the album name, in Spotify's own Lossless color. Still a
+ * button (opens audio quality) read out as "Lossless". Spotify only renders it while streaming lossless. */
+#main-trackInfo-year,
 div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) {
-    display: none;
+    grid-row: -1; /* the row after Spotify's last one */
+}
+
+div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) {
+    justify-self: start;
+    align-self: center;
+    z-index: 1; /* above the album line so the icon gets its clicks */
+    pointer-events: none; /* only the icon, the rest of the row stays the album link */
+}
+
+div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) button {
+    display: block;
+    width: var(--ps-lossless-size);
+    height: var(--ps-lossless-size);
+    font-size: 0;
+    background-color: currentColor;
+    mask: var(--ps-lossless-icon) center / contain no-repeat;
+    pointer-events: auto;
+}
+
+div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) ~ #main-trackInfo-year {
+    padding-inline-start: calc(var(--ps-lossless-size) + 4px); /* Spotify's gap between a badge and its text */
 }
 
 /* explicit "E" tag */
