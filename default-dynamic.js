@@ -1004,6 +1004,111 @@ window.__dynamicBgSetCover = function (url) {
 Spicetify.Player.addEventListener("songchange", songchange);
 songchange();
 
+// Now playing lyrics card. Spotify's collapsed card is a static excerpt and its open card is the
+// synced lyrics, so this keeps it open. user.css shows it compact (current line under the title,
+// sung lines collapsed) and our Show more / Show less switches to Spotify's full card. Spotify
+// remembers its own "Show more" until it restarts; only its open card has the full screen / cinema
+// buttons. Each card is clicked open at most once.
+const openedLyricsCards = new WeakSet();
+const watchedLyricsCards = new WeakSet();
+const lastLyric = new WeakMap(); // card -> { index, step } of the line marked last
+const lyricTokens = { sung: null, upcoming: null };
+let lyricsFull = false;
+
+// Lines only differ by hashed state classes (sung / current / upcoming), so the current line is the
+// single line between a run of sung lines and a run of upcoming ones. The tokens learned from that
+// cover the edges of a song, when one of the runs is missing.
+function markCurrentLyric(card) {
+    const all = [...card.querySelectorAll('[dir="auto"]')];
+    if (!all.length) return;
+    const lines = all.filter((l) => l.classList[0] === all[0].classList[0]);
+    const runs = [];
+    lines.forEach((l, i) => {
+        const t = l.classList[1];
+        if (runs.length && runs[runs.length - 1].t === t) runs[runs.length - 1].n++;
+        else runs.push({ t, i, n: 1 });
+    });
+    let cur = runs.findIndex((r, k) => r.n === 1 && k > 0 && k < runs.length - 1);
+    if (cur > 0) {
+        lyricTokens.sung = runs[cur - 1].t;
+        lyricTokens.upcoming = runs[cur + 1].t;
+    } else if (runs.length === 2) cur = runs[0].t === lyricTokens.sung ? 1 : runs[1].t === lyricTokens.upcoming ? 0 : -1;
+    const line = cur >= 0 ? lines[runs[cur].i] : runs.length === 1 && runs[0].t === lyricTokens.sung ? lines[lines.length - 1] : null;
+    const marked = card.querySelector("[data-ps-current]");
+    if (marked === line) return;
+    marked?.removeAttribute("data-ps-current");
+    line?.setAttribute("data-ps-current", "");
+    // Spotify swaps the line elements on every line change, so the sung line goes away at once.
+    // When the song moves on by one line, glide the rest up by the height it left instead.
+    const index = line ? lines.indexOf(line) : -1;
+    const last = lastLyric.get(card);
+    if (line && card.dataset.psLyrics === "compact" && last && index === last.index + 1) {
+        line.parentElement.animate([{ transform: `translateY(${last.step}px)` }, { transform: "none" }], { duration: 300, easing: "ease-out" });
+    }
+    lastLyric.set(card, { index, step: line ? line.offsetHeight + parseFloat(getComputedStyle(line).marginBottom) : 0 });
+}
+
+function addLyricsToggle(card) {
+    let own = card.querySelector("[data-ps-lyrics-toggle]");
+    const spotifys = card.querySelector('[data-encore-id="buttonPrimary"]:not([data-ps-lyrics-toggle])');
+    if (!own && spotifys) {
+        own = spotifys.cloneNode(true);
+        own.setAttribute("data-ps-lyrics-toggle", "");
+        own.addEventListener("click", (e) => {
+            e.stopPropagation();
+            lyricsFull = !lyricsFull;
+            setupLyricsCard();
+            // Spotify only scrolls on the next line change, so center the current line right away
+            if (lyricsFull)
+                requestAnimationFrame(() => {
+                    const line = card.querySelector("[data-ps-current]");
+                    const box = line?.parentElement?.parentElement;
+                    if (!box) return;
+                    const l = line.getBoundingClientRect();
+                    const b = box.getBoundingClientRect();
+                    box.scrollTop += l.top - b.top - (b.height - l.height) / 2;
+                });
+        });
+        spotifys.after(own);
+    }
+    const label = own?.lastElementChild;
+    const text = lyricsFull ? "Show less" : "Show more";
+    if (label && label.textContent !== text) label.textContent = text;
+}
+
+function setupLyricsCard() {
+    try {
+        const card = document.querySelector('[data-testid="lyrics-npv-section"]');
+        if (!card) return;
+        if (!card.querySelector('[data-encore-id="buttonTertiary"]')) {
+            const toggle = card.querySelector('[data-encore-id="buttonPrimary"]');
+            if (!toggle || openedLyricsCards.has(card)) return;
+            openedLyricsCards.add(card);
+            toggle.click();
+            return;
+        }
+        const mode = lyricsFull ? "full" : "compact";
+        if (card.dataset.psLyrics !== mode) card.dataset.psLyrics = mode;
+        addLyricsToggle(card);
+        markCurrentLyric(card);
+        if (!watchedLyricsCards.has(card)) {
+            watchedLyricsCards.add(card);
+            // immediate, so a frame is never drawn between Spotify's swap and the new mark
+            new MutationObserver(() => markCurrentLyric(card)).observe(card, { subtree: true, childList: true, attributes: true, attributeFilter: ["class"] });
+        }
+    } catch (e) {}
+}
+// a timer, not requestAnimationFrame, so the card is ready before a hidden window is shown
+let lyricsCheckQueued = false;
+new MutationObserver(() => {
+    if (lyricsCheckQueued) return;
+    lyricsCheckQueued = true;
+    setTimeout(() => {
+        lyricsCheckQueued = false;
+        setupLyricsCard();
+    }, 100);
+}).observe(document.body, { childList: true, subtree: true });
+
 (function Startup() {
     if (!Spicetify.showNotification) {
         setTimeout(Startup, 300);

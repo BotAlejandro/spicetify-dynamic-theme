@@ -1096,6 +1096,7 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-glass-blur: 24px; /* blur behind popups so the page under them doesn't fight the text */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
+    --ps-lyrics-card-height: 5.5em; /* synced lyrics in the now playing card, in lyric-size ems */
     --ps-lossless-size: 0.6875rem; /* Lossless icon in front of the album name, as tall as the album line's text */
     --ps-lossless-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='0' y='5' width='2' height='6' rx='1'/%3E%3Crect x='3.5' y='2.5' width='2' height='11' rx='1'/%3E%3Crect x='7' y='0' width='2' height='16' rx='1'/%3E%3Crect x='10.5' y='3.5' width='2' height='9' rx='1'/%3E%3Crect x='14' y='6' width='2' height='4' rx='1'/%3E%3C/svg%3E"); /* sound wave */
 }
@@ -1380,10 +1381,50 @@ div:has(> #main-trackInfo-year):has(> div [data-encore-id="text"] > button) > #m
 }
 
 /* Lyrics: smaller top gap, no "Lyrics provided by" line */
-div[style*="--lyrics-color-active"] > div:has(div[dir="auto"]) {
+div[style*="--lyrics-color-active"]:not([data-testid="lyrics-npv-section"]) > div:has(div[dir="auto"]) {
     margin-top: var(--ps-lyrics-gap);
 }
 
 div[style*="--lyrics-color-active"] div:not([dir]):has(> p[data-encore-id="text"]) {
     display: none;
+}
+
+/* Now playing lyrics card, set up by default-dynamic.js (data-ps-lyrics): Spotify's open card, so the
+ * synced lyrics, shown compact with the current line right under the title. Our Show more / Show
+ * less switches to Spotify's full card. */
+[data-npv-root] [data-ps-lyrics] {
+    padding-top: calc(var(--section-padding) - 10px); /* the 32px header row and the font's ascent sat the title 10px lower than the side inset */
+}
+
+/* Spotify's own toggle, ours sits next to it */
+[data-ps-lyrics] [data-encore-id="buttonPrimary"]:not([data-ps-lyrics-toggle]) {
+    display: none;
+}
+
+[data-npv-root] [data-ps-lyrics="compact"] {
+    gap: 8px;
+}
+
+[data-npv-root] [data-ps-lyrics="compact"] > div:has([dir="auto"]) {
+    flex: none;
+    height: var(--ps-lyrics-card-height);
+    margin-top: 0;
+    padding-top: 0;
+    mask-image: linear-gradient(#000 calc(100% - 1em), transparent);
+}
+
+/* Spotify scrolls the box to center the current line, here the sung lines collapse instead. The list
+ * is clipped to the box so there is nothing to scroll; a clipped box would hand Spotify's scroll on
+ * to the card and the whole panel. */
+[data-npv-root] [data-ps-lyrics="compact"] > div:has([dir="auto"]) > div {
+    height: 100%;
+    overflow: clip;
+}
+
+/* sung lines; default-dynamic.js glides the rest up when the song moves on a line */
+[data-ps-lyrics="compact"] [dir="auto"]:has(~ [data-ps-current]) {
+    height: 0;
+    margin-block: 0;
+    opacity: 0;
+    overflow: hidden;
 }
