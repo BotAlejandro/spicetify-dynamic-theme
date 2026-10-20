@@ -1313,19 +1313,20 @@ aside[data-testid="now-playing-bar"] div:has(> div > [data-testid="volume-bar"])
     color: inherit;
 }
 
-/* Lossless: Spotify's quality line would be a 4th line, so it shares the album line's row and its
- * button is drawn as an icon in front of the album name, in Spotify's own Lossless color. Still a
- * button (opens audio quality) read out as "Lossless". Spotify only renders it while streaming lossless. */
+/* Lossless: Spotify's quality line would be a 4th line. Its button moves onto the album line's row,
+ * invisible, over an icon drawn in front of the album name. The icon lives on the album line because
+ * on some song changes Spotify drops the quality line for a frame and re-adds it in another order. */
 #main-trackInfo-year,
 div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) {
     grid-row: -1; /* the row after Spotify's last one */
 }
 
+/* Spotify's button: kept for its click (opens audio quality) and its "Lossless" name */
 div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) {
     justify-self: start;
     align-self: center;
-    z-index: 1; /* above the album line so the icon gets its clicks */
-    pointer-events: none; /* only the icon, the rest of the row stays the album link */
+    z-index: 1; /* above the album line so the icon spot gets its clicks */
+    pointer-events: none; /* only the button, the rest of the row stays the album link */
 }
 
 div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) button {
@@ -1333,13 +1334,38 @@ div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) button {
     width: var(--ps-lossless-size);
     height: var(--ps-lossless-size);
     font-size: 0;
-    background-color: currentColor;
-    mask: var(--ps-lossless-icon) center / contain no-repeat;
     pointer-events: auto;
 }
 
-div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) ~ #main-trackInfo-year {
+/* the icon, in the color Spotify gives Lossless in this theme. It and its room only go away once the
+ * quality line has been gone for a moment, so the one-frame drop doesn't blink it or move the text. */
+#main-trackInfo-year {
+    position: relative;
+    transition: padding-inline-start 0s 0.15s;
+}
+
+#main-trackInfo-year::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    top: 50%;
+    translate: 0 -50%;
+    width: var(--ps-lossless-size);
+    height: var(--ps-lossless-size);
+    background-color: var(--spice-button-active);
+    mask: var(--ps-lossless-icon) center / contain no-repeat;
+    opacity: 0;
+    transition: opacity 0s 0.15s;
+}
+
+div:has(> #main-trackInfo-year):has(> div [data-encore-id="text"] > button) > #main-trackInfo-year {
     padding-inline-start: calc(var(--ps-lossless-size) + 4px); /* Spotify's gap between a badge and its text */
+    transition: none;
+}
+
+div:has(> #main-trackInfo-year):has(> div [data-encore-id="text"] > button) > #main-trackInfo-year::before {
+    opacity: 1;
+    transition: none;
 }
 
 /* explicit "E" tag */
