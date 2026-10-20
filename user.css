@@ -1129,7 +1129,7 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-cover-blur: 10px;
     --ps-cover-opacity: calc(var(--is_light) * 0.05 + 0.2);
     --ps-canvas-height: 24.75em;
-    --ps-canvas-opacity: 0.4;
+    --ps-canvas-opacity: .8;
     --ps-npv-header: 64px; /* Spotify's now playing header height */
     --ps-pin-fade: 32px; /* scroll distance a see-through bar takes to turn solid */
     --ps-bar-inset: 8px; /* player bar inner gap, same as the gap around the cover */
@@ -1251,7 +1251,8 @@ div[role="presentation"]:has(> div > button[class*="legacy-chip"]) {
 /* Popups over content: card color + blur. The encore menu covers every Spotify menu
  * (context menus, submenus, sort dropdowns). */
 [data-encore-id="menu"],
-#search-dropdown > div {
+#search-dropdown > div,
+[data-npv-root] .encore-over-media-set > button /* "Switch to video" over the canvas, Spotify's is always 54% black */ {
     background-color: var(--ps-card) !important;
     backdrop-filter: blur(var(--ps-glass-blur));
     -webkit-backdrop-filter: blur(var(--ps-glass-blur));
@@ -1271,12 +1272,20 @@ div[role="presentation"]:has(> div > button[class*="legacy-chip"]) {
     opacity: var(--ps-artist-photo-opacity);
 }
 
-/* live canvas video in the right panel */
+/* live canvas video in the right panel: fades into whatever is behind the panel, so it works in
+ * light and dark mode. Top fade keeps the header readable, bottom fade uses the same 55-90% as
+ * Spotify's own shade since that's where the title block overlaps the video. */
 [data-canvas-surface] {
     height: var(--ps-canvas-height);
     overflow: hidden;
     border-radius: var(--ps-radius);
     opacity: var(--ps-canvas-opacity);
+    mask-image: linear-gradient(transparent, rgb(0 0 0 / 0.35) var(--ps-npv-header), #000 calc(var(--ps-npv-header) * 2) 55%, transparent 90%);
+}
+
+/* Spotify's dark shades over the video, a gray box in light mode */
+[data-canvas-surface] [aria-hidden="true"] {
+    display: none;
 }
 
 /* Hover */
