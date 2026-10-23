@@ -1028,8 +1028,49 @@ async function initDynamicBgKawarp() {
         } catch (_e) {}
     }
 }
-// Static cover background from user.css instead of the kawarp warp
-// initDynamicBgKawarp();
+// Kawarp is opt-in ("Animated background" in the profile menu), otherwise user.css paints the static
+// cover. Turning it off disposes the warp and drops its canvas, since a released WebGL canvas can't be reused.
+const ANIMATED_BG_KEY = "DefaultDynamic:animated-background";
+let animatedBgLoading = null;
+function setAnimatedBackground(on) {
+    document.documentElement.dataset.psBackground = on ? "animated" : "static";
+    try {
+        localStorage.setItem(ANIMATED_BG_KEY, on ? "1" : "0");
+    } catch (e) {}
+    // a toggle during the import is settled once it resolves
+    if (animatedBgLoading) return;
+    if (on) {
+        animatedBgLoading = initDynamicBgKawarp().then(() => {
+            animatedBgLoading = null;
+            if (document.documentElement.dataset.psBackground !== "animated") setAnimatedBackground(false);
+        });
+    } else if (window.__dynamicBgInit) {
+        try {
+            __kawarpInstance?.stop();
+            __kawarpInstance?.dispose();
+        } catch (e) {}
+        __kawarpInstance = null;
+        __kawarpIsAnimated = null;
+        window.__dynamicBgInit = false;
+        document.getElementById("dynamic-bg-canvas")?.remove();
+    }
+}
+let animatedBackground = false;
+try {
+    animatedBackground = localStorage.getItem(ANIMATED_BG_KEY) === "1";
+} catch (e) {}
+setAnimatedBackground(animatedBackground);
+(function AnimatedBackgroundOption() {
+    if (!Spicetify.Menu) {
+        setTimeout(AnimatedBackgroundOption, 300);
+        return;
+    }
+    new Spicetify.Menu.Item("Animated background", animatedBackground, (item) => {
+        animatedBackground = !animatedBackground;
+        item.setState(animatedBackground);
+        setAnimatedBackground(animatedBackground);
+    }).register();
+})();
 window.__dynamicBgSetCover = function (url) {
     try {
         if (!url) return;

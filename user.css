@@ -1144,7 +1144,21 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-lossless-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='0' y='5' width='2' height='6' rx='1'/%3E%3Crect x='3.5' y='2.5' width='2' height='11' rx='1'/%3E%3Crect x='7' y='0' width='2' height='16' rx='1'/%3E%3Crect x='10.5' y='3.5' width='2' height='9' rx='1'/%3E%3Crect x='14' y='6' width='2' height='4' rx='1'/%3E%3C/svg%3E"); /* sound wave */
 }
 
-/* background cover: two big blurred copies over the whole window (kawarp is off in default-dynamic.js) */
+/* Animated background (profile menu, default-dynamic.js sets data-ps-background): upstream's Kawarp
+ * canvas instead of the static cover. A solid pinned bar can't match a moving background, so pinned
+ * bars only blur what scrolls under them. Any fill showed up as a box over the panel. */
+html[data-ps-background="animated"] {
+    --ps-pinned-glass: transparent;
+    --ps-pinned-blur: blur(var(--ps-glass-blur));
+}
+
+html[data-ps-background="animated"] #main::before,
+html[data-ps-background="animated"] #main::after,
+html:not([data-ps-background="animated"]) #dynamic-bg-canvas {
+    display: none;
+}
+
+/* background cover: two big blurred copies over the whole window */
 #main::before,
 #main::after {
     content: "";
@@ -1191,10 +1205,10 @@ main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]), /* home/se
 section[data-testid="artist-page"] > div:has(> button[aria-controls="sort-and-view-picker"]), /* discography sort bar */
 [data-npv-root] > div:first-child {
     /* now playing panel header */
-    --ps-pinned: linear-gradient(var(--ps-region-tint, transparent) 0 0), var(--ps-backdrop);
+    --ps-pinned: var(--ps-pinned-glass, linear-gradient(var(--ps-region-tint, transparent) 0 0), var(--ps-backdrop));
     background: var(--ps-pinned) !important;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    backdrop-filter: var(--ps-pinned-blur, none);
+    -webkit-backdrop-filter: var(--ps-pinned-blur, none);
 }
 
 /* Spotify's own tint/darken layers inside pinned bars */
@@ -1218,6 +1232,8 @@ main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style
 
 [data-npv-root]:has([data-canvas-surface]) > div:first-child {
     background: none !important;
+    backdrop-filter: none; /* the blur goes on the fading ::before, so the video stays sharp */
+    -webkit-backdrop-filter: none;
 }
 
 [data-npv-root]:has([data-canvas-surface]) > div:first-child::before {
@@ -1226,6 +1242,8 @@ main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style
     inset: 0;
     z-index: -1;
     background: var(--ps-pinned);
+    backdrop-filter: var(--ps-pinned-blur, none);
+    -webkit-backdrop-filter: var(--ps-pinned-blur, none);
     animation: ps-fade-in linear both;
     animation-timeline: --ps-npv-content;
     animation-range: exit-crossing calc(-1 * var(--ps-pin-fade)) exit-crossing 0%;
