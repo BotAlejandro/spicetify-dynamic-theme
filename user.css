@@ -1240,14 +1240,6 @@ main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style
     }
 }
 
-/* upstream frosts every filter chip wrapper, which leaves boxes behind the chips */
-div[role="presentation"]:has(> button[class*="legacy-chip"]),
-div[role="presentation"]:has(> div > button[class*="legacy-chip"]) {
-    background: none !important;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-}
-
 /* Cards */
 #Desktop_PanelContainer_Id {
     border-radius: var(--ps-radius);
