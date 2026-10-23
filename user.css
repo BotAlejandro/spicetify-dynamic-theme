@@ -1353,7 +1353,7 @@ button[aria-label="Create"] {
 }
 
 /* Hidden controls: save buttons (both states), miniplayer, fullscreen, row "..." (same as right click) */
-[data-testid="now-playing-widget"] button[aria-checked],
+[data-testid^="now-playing-widget"] button[aria-checked] /* both player bars, 1.3.6 has a -v2 one */,
 [role="row"] button[aria-checked],
 [data-testid="pip-toggle-button"],
 [data-testid="fullscreen-mode-button"],
@@ -1386,23 +1386,29 @@ aside[data-testid="now-playing-bar"] div:has(> div > [data-testid="volume-bar"])
     color: inherit;
 }
 
-/* Lossless: Spotify's quality line would be a 4th line. Its button moves onto the album line's row,
- * invisible, over an icon drawn in front of the album name. The icon lives on the album line because
- * on some song changes Spotify drops the quality line for a frame and re-adds it in another order. */
-#main-trackInfo-year,
-div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) {
-    grid-row: -1; /* the row after Spotify's last one */
+/* Lossless, in Spotify 1.3.6's player bar (now-playing-widget-v2): the quality line would be a 4th
+ * line. The info column becomes a grid so it can share the album line's row, with its button invisible
+ * over an icon drawn in front of the album name. The icon lives on the album line because on some song
+ * changes Spotify drops the quality line for a frame. The old player bar is left to upstream's #150 fix. */
+[data-testid="now-playing-widget-v2"] > div:has([data-testid="now-playing-widget-v2-byline"]) {
+    display: grid;
 }
 
-/* Spotify's button: kept for its click (opens audio quality) and its "Lossless" name */
-div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) {
-    justify-self: start;
+/* the album line (default-dynamic.js puts it in this column) and the quality line share the last row */
+[data-testid="now-playing-widget-v2"] #main-trackInfo-year,
+[data-testid="now-playing-widget-v2"] > div > div:has([data-testid="context-item-info-quality"]) {
+    grid-area: 3 / 1;
+}
+
+/* Spotify's quality line: kept for its click (opens audio quality) and its "Lossless" name */
+[data-testid="now-playing-widget-v2"] > div > div:has([data-testid="context-item-info-quality"]) {
     align-self: center;
+    justify-self: start;
     z-index: 1; /* above the album line so the icon spot gets its clicks */
-    pointer-events: none; /* only the button, the rest of the row stays the album link */
+    pointer-events: none; /* only the button, the rest of the line stays the album link */
 }
 
-div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) button {
+[data-testid="now-playing-widget-v2"] [data-testid="context-item-info-quality"] button {
     display: block;
     width: var(--ps-lossless-size);
     height: var(--ps-lossless-size);
@@ -1431,12 +1437,12 @@ div:has(> #main-trackInfo-year) > div:has(button):not(:has(a)) button {
     transition: opacity 0s 0.15s;
 }
 
-div:has(> #main-trackInfo-year):has(> div [data-encore-id="text"] > button) > #main-trackInfo-year {
+[data-testid="now-playing-widget-v2"]:has([data-testid="context-item-info-quality"]) #main-trackInfo-year {
     padding-inline-start: calc(var(--ps-lossless-size) + 4px); /* Spotify's gap between a badge and its text */
     transition: none;
 }
 
-div:has(> #main-trackInfo-year):has(> div [data-encore-id="text"] > button) > #main-trackInfo-year::before {
+[data-testid="now-playing-widget-v2"]:has([data-testid="context-item-info-quality"]) #main-trackInfo-year::before {
     opacity: 1;
     transition: none;
 }
@@ -1457,7 +1463,7 @@ div[style*="--lyrics-color-active"]:not([data-testid="lyrics-npv-section"]) > di
     margin-top: var(--ps-lyrics-gap);
 }
 
-div[style*="--lyrics-color-active"] div:not([dir]):has(> p[data-encore-id="text"]) {
+div[style*="--lyrics-color-active"] div:not([dir]):has(> p[data-encore-id="text"]):not(:has(> div[dir="auto"])) /* not the lines box, which holds "These lyrics aren't synced" */ {
     display: none;
 }
 
@@ -1488,7 +1494,7 @@ div[style*="--lyrics-color-active"] div:not([dir]):has(> p[data-encore-id="text"
 /* Spotify scrolls the box to center the current line, here the sung lines collapse instead. The list
  * is clipped to the box so there is nothing to scroll; a clipped box would hand Spotify's scroll on
  * to the card and the whole panel. */
-[data-npv-root] [data-ps-lyrics="compact"] > div:has([dir="auto"]) > div {
+[data-npv-root] [data-ps-lyrics="compact"] > div:has([dir="auto"]) > div:not([dir]) /* unsynced lyrics have no list, the lines sit in the box */ {
     height: 100%;
     overflow: clip;
 }

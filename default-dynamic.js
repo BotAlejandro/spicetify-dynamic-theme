@@ -69,7 +69,9 @@ function waitForAny(els, func, timeout = 40) {
 /* Album/artist + year line. Legacy `.main-trackInfo-container` is gone in Spotify
  * 1.3.x (0 hits in xpui-snapshot.css) — verified live hosts, from
  * dwp-now-playing-bar.js, are the now-playing bar rows below. */
-const YEAR_LINE_HOSTS = ['[data-testid="now-playing-widget-v2-byline"]', '[data-testid="now-playing-widget"]', ".main-trackInfo-container:not(#upcomingSongDiv)"];
+// Spotify 1.3.6's player bar goes first: in its byline the line landed inside the first artist's span,
+// so any other artists wrapped under it. Its info column gives the line its own row (user.css).
+const YEAR_LINE_HOSTS = ['[data-testid="now-playing-widget-v2"]', '[data-testid="now-playing-widget-v2-byline"]', '[data-testid="now-playing-widget"]', ".main-trackInfo-container:not(#upcomingSongDiv)"];
 
 /* Resolve the title/artist text column inside a year-line host. The host
  * ([data-testid="now-playing-widget"]) is a flex ROW — cover | text column |
@@ -742,7 +744,7 @@ async function songchange(event, retries = 0) {
              * appended to the host renders BESIDE the track. Move it into
              * the title/artist text column so it stacks underneath. */
             try {
-                const scope = yearLine.closest('[data-testid="now-playing-widget"], [data-testid="now-playing-widget-v2-byline"]') || yearLine.parentElement;
+                const scope = yearLine.closest('[data-testid="now-playing-widget-v2"]') || yearLine.closest('[data-testid="now-playing-widget"], [data-testid="now-playing-widget-v2-byline"]') || yearLine.parentElement;
                 if (scope) {
                     const col = findTrackTextColumn(scope);
                     if (col && col !== yearLine.parentElement) col.append(yearLine);
