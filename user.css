@@ -1453,9 +1453,30 @@ aside[data-testid="now-playing-bar"] div:has(> div > [data-testid="volume-bar"])
     background-color: var(--spice-button) !important;
 }
 
-/* 3 column tracklist: wider title column */
-[role="grid"][aria-colcount="3"] [role="row"] > div {
-    grid-template-columns: [index] var(--tracklist-index-column-width, 16px) [first] minmax(290px, var(--col1, 4fr)) [last] minmax(90px, var(--col2, 1fr));
+/* Track numbers: Spotify keeps the number column at 16px, so 4-digit numbers spilled out of the row.
+ * Size it to the playlist's longest number (aria-rowcount is tracks + the header), a ch per digit, and
+ * center the numbers and "#" in it like the hover play button, so short numbers don't sit lopsided. */
+[role="grid"][aria-rowcount] {
+    --ps-tracks: calc(attr(aria-rowcount type(<number>), 1) - 1);
+    --ps-index-digits: calc(1 + clamp(0, var(--ps-tracks) - 9, 1) + clamp(0, var(--ps-tracks) - 99, 1) + clamp(0, var(--ps-tracks) - 999, 1) + clamp(0, var(--ps-tracks) - 9999, 1));
+    --index-column-width: max(16px, calc(var(--ps-index-digits) * 1ch)); /* Spotify's grid template reads this */
+    --tracklist-index-column-width: var(--index-column-width); /* and the number cell this */
+}
+
+[role="grid"] .main-trackList-rowMarker > [data-encore-id="text"] {
+    inset-inline: 0; /* Spotify pins it 4px off the right edge */
+    width: auto;
+    text-align: center;
+}
+
+[role="columnheader"][aria-colindex="1"] {
+    justify-self: center;
+}
+
+/* the playing song's equaliser takes the number's place, Spotify pins it to the left edge */
+.main-trackList-rowMarker > img {
+    inset: 0;
+    margin: auto;
 }
 
 /* Lyrics: smaller top gap, no "Lyrics provided by" line */
