@@ -45,6 +45,7 @@ img.main-devicePicker-nowPlayingActiveIcon,
 .main-addButton-button,
 .main-trackList-playingIcon,
 .main-trackList-rowMarker img,
+img[src*="equaliser-animated-green"], /* home shortcuts and other spots with no shared class */
 .main-trackList-rowHeartButton svg:not(.Svg-img-16-icon),
 .main-actionBar-ActionBarRow > button:hover,
 .main-nowPlayingView-contextItemInfo > button:hover,
