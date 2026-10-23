@@ -1041,11 +1041,13 @@ function markCurrentLyric(card) {
     marked?.removeAttribute("data-ps-current");
     line?.setAttribute("data-ps-current", "");
     // Spotify swaps the line elements on every line change, so the sung line goes away at once.
-    // When the song moves on by one line, glide the rest up by the height it left instead.
+    // When the song moves on by one line, glide the rest up by the height it left instead. The lines
+    // move (user.css, --ps-lyrics-glide), not the list: a moved list would make the box scrollable
+    // and Spotify would scroll it mid-glide.
     const index = line ? lines.indexOf(line) : -1;
     const last = lastLyric.get(card);
     if (line && card.dataset.psLyrics === "compact" && last && index === last.index + 1) {
-        line.parentElement.animate([{ transform: `translateY(${last.step}px)` }, { transform: "none" }], { duration: 300, easing: "ease-out" });
+        line.parentElement.animate([{ "--ps-lyrics-glide": `${last.step}px` }, { "--ps-lyrics-glide": "0px" }], { duration: 300, easing: "ease-out" });
     }
     lastLyric.set(card, { index, step: line ? line.offsetHeight + parseFloat(getComputedStyle(line).marginBottom) : 0 });
 }

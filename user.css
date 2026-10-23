@@ -1499,7 +1499,18 @@ div[style*="--lyrics-color-active"] div:not([dir]):has(> p[data-encore-id="text"
     overflow: clip;
 }
 
-/* sung lines; default-dynamic.js glides the rest up when the song moves on a line */
+/* default-dynamic.js glides the lines up by animating this when the song moves on a line */
+@property --ps-lyrics-glide {
+    syntax: "<length>";
+    inherits: true;
+    initial-value: 0px;
+}
+
+[data-ps-lyrics="compact"] [dir="auto"] {
+    translate: 0 var(--ps-lyrics-glide);
+}
+
+/* sung lines */
 [data-ps-lyrics="compact"] [dir="auto"]:has(~ [data-ps-current]) {
     height: 0;
     margin-block: 0;
