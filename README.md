@@ -2,22 +2,27 @@
 
 Dynamic Spicetify theme with album-art color extraction, cover-based backgrounds, light/dark switching, and additional UI cleanup.
 
+A personal fork of [JulienMaille/spicetify-dynamic-theme](https://github.com/JulienMaille/spicetify-dynamic-theme), kept up to date with it.
+
 ## Preview
 
 ![Theme preview](./preview.gif)
 
 ## Features
 
-- Dynamic accent colors pulled from the current track artwork
-- Blurred background based on the current cover art
+- Accent colors pulled from the current track artwork, including Spotify's green play buttons and equalizers
+- Blurred background based on the current cover art, or an optional animated background
 - Light and dark variants, plus a top-bar toggle button
-- Album or show metadata shown next to the now playing info
+- Album name and year under the artist in the player bar, with Lossless shown as a small sound-wave icon (click it for Spotify's audio quality panel)
+- Lyrics card in the Now Playing panel that follows the song, with the current line at the top; Show more opens the full lyrics
+- Canvas videos blended into the Now Playing panel
+- Track numbers sized to the playlist and centered, along with the playing song's equalizer
 - Extra UI cleanup across headers, gradients, queue, and side panels
 
 ## Requirements
 
-- Spotify desktop
-- [Spicetify CLI](https://github.com/spicetify/cli) installed and working
+- Spotify desktop (tested on 1.3.6)
+- [Spicetify CLI](https://github.com/spicetify/cli) installed and working (Spotify 1.3.6 needs 2.46 or newer)
 - A valid Spicetify config directory already created
 
 ## Install / Update
@@ -43,7 +48,7 @@ Both installers do the following:
 - Set `current_theme` to `DefaultDynamic`
 - Set `color_scheme` to `Dark-Base`
 - Enable `inject_css` and `replace_colors`
-- Add the required `xpui.js_find_8008` and `xpui.js_repl_8008` patch entries
+- Remove the `xpui.js_find_8008` / `xpui.js_repl_8008` patch entries older versions added (they match nothing in current Spotify)
 
 ### Manual Install
 
@@ -51,16 +56,7 @@ Both installers do the following:
 2. Run `spicetify -c` and open the folder that contains `config-xpui.ini`.
 3. Create `Themes/DefaultDynamic` inside that folder, then copy `color.ini` and `user.css` into it.
 4. Copy `default-dynamic.js` and `Vibrant.min.js` into the `Extensions` folder next to `Themes`.
-5. Add these lines under `[Patch]` in `config-xpui.ini`:
-
-```ini
-xpui.js_find_8008 = ,(\w+=)32,
-xpui.js_repl_8008 = ,${1}28,
-```
-
-If you do not already have a `[Patch]` section, create one first.
-
-6. Run:
+5. Run:
 
 ```bash
 spicetify config extensions default-dynamic.js extensions Vibrant.min.js
@@ -71,16 +67,26 @@ spicetify apply
 
 `default-dynamic.js` is required. If you only copy the CSS files, the theme will not work correctly.
 
+### After a Spotify update
+
+Spotify updates remove Spicetify, so the theme disappears. Run `spicetify backup apply` to bring it back. If that fails on a brand-new Spotify version, run `spicetify update` first.
+
 ## Theme Modes
 
-Use Spicetify settings to switch between the included color schemes:
+The theme includes four color schemes:
 
 - `Dark-Base`
 - `Light-Base`
 - `Dark-NoAnimation`
 - `Light-NoAnimation`
 
-The top bar also includes a light/dark toggle button.
+Switch with `spicetify config color_scheme Light-Base` (or any of the names above), then `spicetify apply`. Marketplace users can pick one in Marketplace instead.
+
+The top-bar button switches between light and dark until Spotify restarts; the color scheme sets the default.
+
+## Animated Background
+
+The background is a still, blurred copy of the cover by default. For a moving one, click your profile picture and turn on **Animated background**. It switches right away and is remembered. The `NoAnimation` color schemes keep it still.
 
 ## Uninstall
 
@@ -105,7 +111,7 @@ spicetify config current_theme SpicetifyDefault color_scheme green-dark extensio
 spicetify apply
 ```
 
-2. Remove these lines from the `[Patch]` section in `config-xpui.ini`:
+2. If you installed an older version, remove these lines from the `[Patch]` section in `config-xpui.ini`:
 
 ```ini
 xpui.js_find_8008 = ,(\w+=)32,

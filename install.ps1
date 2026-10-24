@@ -38,31 +38,13 @@ $configFile = Join-Path $spicePath "config-xpui.ini"
 $themeDir = Join-Path $spicePath "Themes\DefaultDynamic"
 $extDir = Join-Path $spicePath "Extensions"
 
-Write-Part "PATCHING       "
+Write-Part "CLEANING UP    "
 Write-Emphasized $configFile
+# older versions added this patch, Spotify 1.3.x has nothing left for it to match
 $configLines = @(Get-Content $configFile)
 $configLines = $configLines | Where-Object {
     $_ -notmatch '^\s*xpui\.js_find_8008\s*=' -and $_ -notmatch '^\s*xpui\.js_repl_8008\s*='
 }
-$patchIndex = [Array]::IndexOf($configLines, "[Patch]")
-if ($patchIndex -lt 0) {
-    if ($configLines.Count -gt 0 -and $configLines[-1] -ne "") {
-        $configLines += ""
-    }
-    $configLines += "[Patch]"
-    $patchIndex = $configLines.Count - 1
-}
-$before = @($configLines[0..$patchIndex])
-$after = @()
-if ($patchIndex + 1 -lt $configLines.Count) {
-    $after = @($configLines[($patchIndex + 1)..($configLines.Count - 1)])
-}
-$configLines = @(
-    $before +
-    "xpui.js_find_8008 = ,(\w+=)32," +
-    'xpui.js_repl_8008 = ,${1}28,' +
-    $after
-)
 Set-Content -Path $configFile -Value $configLines
 Write-Done
 

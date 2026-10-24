@@ -16,12 +16,9 @@ theme_dir="${config_dir}/Themes/DefaultDynamic"
 ext_dir="${config_dir}/Extensions"
 raw_base_url="https://raw.githubusercontent.com/${repo_owner}/${repo_name}/${ref}"
 
-echo "Patching (1/3)"
-if ! grep -q '^\[Patch\]' "${config_file}"; then
-    printf '\n[Patch]\n' >>"${config_file}"
-fi
+echo "Cleaning up (1/3)"
+# older versions added this patch, Spotify 1.3.x has nothing left for it to match
 perl -0pi -e 's/^\s*xpui\.js_find_8008\s*=.*\R?//mg; s/^\s*xpui\.js_repl_8008\s*=.*\R?//mg;' "${config_file}"
-perl -0pi -e 's/\[Patch\]\R/[Patch]\nxpui.js_find_8008 = ,(\\w+=)32,\nxpui.js_repl_8008 = ,\${1}28,\n/' "${config_file}"
 
 echo "Downloading ${ref} (2/3)"
 mkdir -p "${theme_dir}" "${ext_dir}"
