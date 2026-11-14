@@ -1319,6 +1319,12 @@ div[data-encore-id="listRow"] {
     --box-hover-background-color: var(--ps-hover) !important;
 }
 
+/* cards: Spotify's hover box is its neutral #303030, tinted like the home shortcuts instead */
+[data-encore-id="card"] {
+    --background-highlight: var(--background-tinted-highlight);
+    --background-press: var(--background-tinted-press);
+}
+
 /* menu items: Spotify paints its #303030 on the item focused when a menu opens, which shows
  * up as a gray slab on the glass menu; only highlight hover and keyboard focus */
 [data-encore-id="menuRow"] {
