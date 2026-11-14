@@ -1264,6 +1264,28 @@ main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style
     --background-elevated-highlight: transparent;
 }
 
+/* the icon buttons on the right (light/dark, What's New, friends, Studio): Spotify's group pads itself
+ * from whatever comes before it, here the moon, and adds 4px after Studio. Even 8px gaps instead. */
+#global-nav-bar div:has(> [data-testid="user-widget-link"]) > div {
+    padding-inline: 0;
+}
+
+#global-nav-bar div:has(> [data-testid="user-widget-link"]) span > button /* Studio */ {
+    margin-inline-end: 0;
+}
+
+/* and one hover for all of them, the pills' fill and Spotify's slight grow. The moon had its own gray
+ * circle and no grow (both !important upstream), What's New and friends no circle, Studio no hover. */
+#global-nav-bar div:has(> [data-testid="user-widget-link"]) button:not([data-testid="user-widget-link"]):hover {
+    background-color: var(--ps-nav-fill) !important;
+    box-shadow: inset 0 0 0 1px var(--ps-nav-rim) !important;
+}
+
+/* not while pressed, so Studio keeps its press shrink */
+#global-nav-bar div:has(> [data-testid="user-widget-link"]) button:not([data-testid="user-widget-link"]):hover:not(:active) {
+    transform: scale(1.04) !important;
+}
+
 /* Cards */
 #Desktop_PanelContainer_Id {
     border-radius: var(--ps-radius);
