@@ -1116,6 +1116,7 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-nav-fill: rgba(var(--spice-rgb-text), 0.14); /* Home, search and profile in the top bar */
     --ps-nav-fill-hover: rgba(var(--spice-rgb-text), 0.22);
     --ps-nav-rim: rgba(var(--spice-rgb-text), 0.12);
+    --ps-shelf-fade: 96px; /* how far a row of cards fades out at an end with more to scroll */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
     --ps-lyrics-card-height: 5.5em; /* synced lyrics in the now playing card, in lyric-size ems */
@@ -1342,6 +1343,55 @@ div[data-encore-id="listRow"] {
 
 button[aria-label="Create"] {
     background-color: var(--ps-hover);
+}
+
+/* Rows of cards: Spotify shades the ends of a row with a fixed dark gray to hint at more cards, a dark
+ * box on the cover background and a black smear in light mode. The row fades its own cards out
+ * instead, each end only while there's more to scroll that way. */
+[data-shelf="carousel"] > div::before,
+[data-shelf="carousel"] > div::after {
+    display: none;
+}
+
+@property --ps-shelf-start {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@property --ps-shelf-end {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+[data-shelf="carousel"] div[role="presentation"]:has(> div[role="presentation"]) /* the scrolling row */ {
+    mask-image: linear-gradient(to right, transparent, #000 var(--ps-shelf-start), #000 calc(100% - var(--ps-shelf-end)), transparent);
+    animation:
+        ps-shelf-start linear both,
+        ps-shelf-end linear both;
+    animation-timeline: scroll(self inline), scroll(self inline);
+    animation-range:
+        0 var(--ps-shelf-fade),
+        calc(100% - var(--ps-shelf-fade)) 100%;
+}
+
+@keyframes ps-shelf-start {
+    from {
+        --ps-shelf-start: 0px;
+    }
+    to {
+        --ps-shelf-start: var(--ps-shelf-fade);
+    }
+}
+
+@keyframes ps-shelf-end {
+    from {
+        --ps-shelf-end: var(--ps-shelf-fade);
+    }
+    to {
+        --ps-shelf-end: 0px;
+    }
 }
 
 /* Hidden controls: save buttons (both states), miniplayer, fullscreen, row "..." (same as right click) */
