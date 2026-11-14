@@ -21,8 +21,8 @@ A personal fork of [JulienMaille/spicetify-dynamic-theme](https://github.com/Jul
 
 ## Requirements
 
-- Spotify desktop (tested on 1.3.6)
-- [Spicetify CLI](https://github.com/spicetify/cli) installed and working (Spotify 1.3.6 needs 2.46 or newer)
+- Spotify desktop (tested on 1.3.9)
+- [Spicetify CLI](https://github.com/spicetify/cli) installed and working (Spotify 1.3.9 needs 2.46.5 or newer; a new Spotify version usually needs the latest Spicetify)
 - A valid Spicetify config directory already created
 
 ## Install / Update
