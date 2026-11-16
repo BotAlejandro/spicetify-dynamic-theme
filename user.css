@@ -1104,8 +1104,8 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-backdrop: var(--spice-main); /* what shows behind every panel */
     --ps-card: rgba(var(--spice-rgb-highlight), 0.9);
     --ps-hover: rgba(var(--spice-rgb-selected-row), 0.1);
-    --ps-cover-blur: 10px;
-    --ps-cover-opacity: calc(var(--is_light) * 0.05 + 0.2);
+    --ps-cover-blur: 20px; /* still background softness */
+    --ps-cover-opacity: calc(var(--is_light) * 0.05 + 0.3); /* still background: 0.3 dark, 0.35 light */
     --ps-canvas-height: 24.75em;
     --ps-canvas-opacity: 0.8;
     --ps-npv-header: 64px; /* Spotify's now playing header height */
@@ -1142,40 +1142,27 @@ html[data-ps-background="animated"] {
 }
 
 html[data-ps-background="animated"] #main::before,
-html[data-ps-background="animated"] #main::after,
 html:not([data-ps-background="animated"]) #dynamic-bg-canvas {
     display: none;
 }
 
-/* background cover: two big blurred copies over the whole window */
-#main::before,
-#main::after {
+/* background cover: one blurred copy over the whole window. Two rounded copies left their curved
+ * edges as a shape that stayed on every song. It reaches three blur radii past the window so the blur
+ * doesn't fade out at the edges. */
+#main::before {
     content: "";
     background-image: var(--image_url);
-    background-size: 100%;
-    background-position: center center;
+    background-size: cover;
+    background-position: center;
     position: absolute;
     display: block;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: calc(var(--ps-cover-blur) * -3);
     filter: blur(var(--ps-cover-blur));
     pointer-events: none;
     backface-visibility: hidden;
     transition: background-image linear 0.35s;
     opacity: var(--ps-cover-opacity);
     z-index: 2;
-    width: 200%;
-    border-radius: 40%;
-}
-
-#main::before {
-    translate: -35%;
-}
-
-#main::after {
-    translate: 15%;
 }
 
 /* Regions: a scrolling area sets --ps-region-tint, its own color on top of the backdrop */
