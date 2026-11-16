@@ -1118,6 +1118,7 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-nav-rim: rgba(var(--spice-rgb-text), 0.12);
     --ps-shelf-fade: 96px; /* how far a row of cards fades out at an end with more to scroll */
     --ps-library-fade: 32px; /* same for the top and bottom of the library list */
+    --ps-peek-nudge: 12px; /* Spotify slides the right panel's peek strip in by this much on hover */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
     --ps-lyrics-card-height: 5.5em; /* synced lyrics in the now playing card, in lyric-size ems */
@@ -1285,6 +1286,17 @@ main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style
 /* not while pressed, so Studio keeps its press shrink */
 #global-nav-bar div:has(> [data-testid="user-widget-link"]) button:not([data-testid="user-widget-link"]):hover:not(:active) {
     transform: scale(1.04) !important;
+}
+
+/* Right panel peek: with the library open in a narrow window, the now playing panel shrinks to a strip
+ * that slides in on hover, and Spotify fakes the gap beside it with a bar in its base color, a black
+ * strip here where the real gaps show the background. The page pulls its edge back instead. */
+.Root__right-sidebar-fauxMainViewEnd {
+    display: none;
+}
+
+#main:has(.Root__right-sidebar-peek:not(.Root__right-sidebar-expanded):hover) #main-view {
+    clip-path: inset(0 var(--ps-peek-nudge) 0 0 round var(--ps-radius));
 }
 
 /* Cards */
