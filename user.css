@@ -1613,6 +1613,12 @@ div[style*="--lyrics-color-active"] div:not([dir]):has(> p[data-encore-id="text"
     padding-top: calc(var(--section-padding) - 10px); /* the 32px header row and the font's ascent sat the title 10px lower than the side inset */
 }
 
+/* animated background: Spotify's solid lyrics color hid the moving background, while the still
+ * background's layer softens the card by --ps-cover-opacity. The card lets the same share through. */
+html[data-ps-background="animated"] [data-npv-root] [data-ps-lyrics] {
+    background-color: color-mix(in srgb, var(--lyrics-color-background) calc((1 - var(--ps-cover-opacity)) * 100%), transparent);
+}
+
 /* Spotify's own toggle, ours sits next to it */
 [data-ps-lyrics] [data-encore-id="buttonPrimary"]:not([data-ps-lyrics-toggle]) {
     display: none;
