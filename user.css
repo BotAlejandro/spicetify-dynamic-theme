@@ -1316,10 +1316,24 @@ main > div > div:has(> div > [style*="--scrollAnimationRangeStart"]) > div[style
  * (context menus, submenus, sort dropdowns). */
 [data-encore-id="menu"],
 #search-dropdown > div,
+[data-tippy-root] div:has(> [role="tooltip"]) /* hover tooltips, Spotify's are near-black --spice-card */,
+.main-contextMenu-tippy /* Spicetify's top bar button tooltips, like the light/dark one */,
 [data-npv-root] .encore-over-media-set > button /* "Switch to video" over the canvas, Spotify's is always 54% black */ {
     background-color: var(--ps-card) !important;
     backdrop-filter: blur(var(--ps-glass-blur));
     -webkit-backdrop-filter: blur(var(--ps-glass-blur));
+}
+
+/* Spicetify's tooltips have no box of their own on this Spotify version, only floating text. They
+ * get the box of Spotify's tooltips (sizes from those) so all tooltips match. */
+.main-contextMenu-tippy {
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--spice-text);
+    font-size: 0.875rem;
+    box-shadow:
+        0 16px 24px rgb(0 0 0 / 0.3),
+        0 6px 8px rgb(0 0 0 / 0.2);
 }
 
 #Desktop_PanelContainer_Id section > button /* about the artist without a picture */ {
