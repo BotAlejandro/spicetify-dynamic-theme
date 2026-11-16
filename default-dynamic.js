@@ -368,18 +368,16 @@ function __kawarpApplyTint(explicitDark) {
          * every palette resolution) — red-dominant cover keeps the canvas
          * neutral instead of flooding the page red. */
         if (__isRedDominantHex(textColor)) {
+            /* Tame the red flood, but NEVER withhold the new cover here: this
+             * function is the only palette-fresh entry point, so returning
+             * early leaves the canvas showing the PREVIOUS image forever when
+             * consecutive items read red-dominant (issue #156 — DJ/narration
+             * art is often red, so the background froze on the last cover).
+             * __dynamicBgSetCover now always paints the current cover; we only
+             * adjust the canvas styling below to keep the wash neutral. */
             __neutralizeRedWashCanvas();
             return;
         }
-        /* A cover withheld by the red-wash guard in __dynamicBgSetCover now
-         * has a fresh non-red verdict — paint it (one-shot). */
-        try {
-            const pending = window.__pendingBgCover;
-            if (pending) {
-                window.__pendingBgCover = null;
-                if (typeof __kawarpInstance !== "undefined" && __kawarpInstance && __kawarpInstance.loadImage) __kawarpInstance.loadImage(pending);
-            }
-        } catch (e) {}
         const dark = typeof explicitDark === "boolean" ? explicitDark : !isLight(textColorBg);
         const luma = __kawarpCoverLuma();
         // Dark: bright covers need max dark-area tint; dark covers less.
@@ -1031,19 +1029,15 @@ initDynamicBgKawarp();
 window.__dynamicBgSetCover = function (url) {
     try {
         if (!url) return;
-        /* Red-wash guard (last-known-palette fast path): withhold a cover
-         * while the palette reads red-dominant — __kawarpApplyTint paints the
-         * stashed URL once the fresh palette clears it as non-red. */
-        if (__isRedDominantHex(textColor)) {
-            try {
-                window.__pendingBgCover = url;
-            } catch (e) {}
-            __neutralizeRedWashCanvas();
-            return;
-        }
-        try {
-            window.__pendingBgCover = null;
-        } catch (e) {}
+        /* Issue #156: always feed the CURRENT cover to the warp canvas. A
+         * red-dominant last-known palette used to withhold the cover here and
+         * stash it in window.__pendingBgCover, but the only release site
+         * (__kawarpApplyTint) bails out on red palettes — so consecutive red
+         * items (DJ/narration art especially) froze the background on the
+         * previous image. Keep the canvas dimmed/desaturated while red so the
+         * wash stays tame; the fresh palette in __kawarpApplyTint restores the
+         * normal tint once it resolves. */
+        if (__isRedDominantHex(textColor)) __neutralizeRedWashCanvas();
         __kawarpLoadCover(url);
     } catch (e) {}
 };
