@@ -1117,6 +1117,7 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-nav-fill-hover: rgba(var(--spice-rgb-text), 0.22);
     --ps-nav-rim: rgba(var(--spice-rgb-text), 0.12);
     --ps-shelf-fade: 96px; /* how far a row of cards fades out at an end with more to scroll */
+    --ps-library-fade: 32px; /* same for the top and bottom of the library list */
     --ps-artist-photo-opacity: 0.8;
     --ps-lyrics-gap: 2vh;
     --ps-lyrics-card-height: 5.5em; /* synced lyrics in the now playing card, in lyric-size ems */
@@ -1367,53 +1368,73 @@ button[aria-label="Create"] {
     background-color: var(--ps-hover);
 }
 
+/* Scroll edge fades: a scroller fades its own content out at an end, only while there's more to scroll
+ * that way (a scroll-driven animation per end). A scroller sets --ps-edge-fade, its mask and its axis. */
+@property --ps-edge-start {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@property --ps-edge-end {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@keyframes ps-edge-start {
+    from {
+        --ps-edge-start: 0px;
+    }
+    to {
+        --ps-edge-start: var(--ps-edge-fade);
+    }
+}
+
+@keyframes ps-edge-end {
+    from {
+        --ps-edge-end: var(--ps-edge-fade);
+    }
+    to {
+        --ps-edge-end: 0px;
+    }
+}
+
 /* Rows of cards: Spotify shades the ends of a row with a fixed dark gray to hint at more cards, a dark
- * box on the cover background and a black smear in light mode. The row fades its own cards out
- * instead, each end only while there's more to scroll that way. */
+ * box on the cover background and a black smear in light mode. The row fades its own cards instead. */
 [data-shelf="carousel"] > div::before,
 [data-shelf="carousel"] > div::after {
     display: none;
 }
 
-@property --ps-shelf-start {
-    syntax: "<length>";
-    inherits: false;
-    initial-value: 0px;
-}
-
-@property --ps-shelf-end {
-    syntax: "<length>";
-    inherits: false;
-    initial-value: 0px;
-}
-
 [data-shelf="carousel"] div[role="presentation"]:has(> div[role="presentation"]) /* the scrolling row */ {
-    mask-image: linear-gradient(to right, transparent, #000 var(--ps-shelf-start), #000 calc(100% - var(--ps-shelf-end)), transparent);
+    --ps-edge-fade: var(--ps-shelf-fade);
+    mask-image: linear-gradient(to right, transparent, #000 var(--ps-edge-start), #000 calc(100% - var(--ps-edge-end)), transparent);
     animation:
-        ps-shelf-start linear both,
-        ps-shelf-end linear both;
+        ps-edge-start linear both,
+        ps-edge-end linear both;
     animation-timeline: scroll(self inline), scroll(self inline);
     animation-range:
-        0 var(--ps-shelf-fade),
-        calc(100% - var(--ps-shelf-fade)) 100%;
+        0 var(--ps-edge-fade),
+        calc(100% - var(--ps-edge-fade)) 100%;
 }
 
-@keyframes ps-shelf-start {
-    from {
-        --ps-shelf-start: 0px;
-    }
-    to {
-        --ps-shelf-start: var(--ps-shelf-fade);
-    }
+/* Library list: Spotify puts a heavy black shadow under the header as soon as the list scrolls, a dark
+ * band over the cover background. The list fades its own top and bottom instead. */
+#Desktop_LeftSidebar_Id div:has(> header) {
+    box-shadow: none;
 }
 
-@keyframes ps-shelf-end {
-    from {
-        --ps-shelf-end: var(--ps-shelf-fade);
-    }
-    to {
-        --ps-shelf-end: 0px;
-    }
+#Desktop_LeftSidebar_Id [data-overlayscrollbars-viewport] {
+    --ps-edge-fade: var(--ps-library-fade);
+    mask-image: linear-gradient(transparent, #000 var(--ps-edge-start), #000 calc(100% - var(--ps-edge-end)), transparent);
+    animation:
+        ps-edge-start linear both,
+        ps-edge-end linear both;
+    animation-timeline: scroll(self), scroll(self);
+    animation-range:
+        0 var(--ps-edge-fade),
+        calc(100% - var(--ps-edge-fade)) 100%;
 }
 
 /* Hidden controls: save buttons (both states), miniplayer, fullscreen, row "..." (same as right click) */
