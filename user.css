@@ -1453,6 +1453,17 @@ button[aria-label="Create"] {
         calc(100% - var(--ps-edge-fade)) 100%;
 }
 
+/* "Open Your Library" (collapsed library): on hover Spotify covers the library icon with the "open"
+ * one on a --background-base patch, transparent in this theme, so the two icons showed tangled. The
+ * library icon fades out instead. Matched by its two icons, so the expanded header isn't touched. */
+#Desktop_LeftSidebar_Id button:has(> span + span > svg) > span:first-child {
+    transition: opacity 0.1s ease-out;
+}
+
+#Desktop_LeftSidebar_Id button:has(> span + span > svg):hover > span:first-child {
+    opacity: 0;
+}
+
 /* Hidden controls: save buttons (both states), miniplayer, fullscreen, row "..." (same as right click) */
 [data-testid^="now-playing-widget"] button[aria-checked] /* both player bars, 1.3.6 has a -v2 one */,
 [role="row"] button[aria-checked],
