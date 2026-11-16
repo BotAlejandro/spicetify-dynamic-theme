@@ -1106,7 +1106,7 @@ div:has(> section[data-testid="home-page"]) > div[style*="background-color"] {
     --ps-hover: rgba(var(--spice-rgb-selected-row), 0.1);
     --ps-cover-blur: 20px; /* still background softness */
     --ps-cover-opacity: calc(var(--is_light) * 0.05 + 0.3); /* still background: 0.3 dark, 0.35 light */
-    --ps-animated-opacity: 0.5; /* animated background strength */
+    --ps-animated-opacity: 0.6; /* animated background strength */
     --ps-canvas-height: 24.75em;
     --ps-canvas-opacity: 0.8;
     --ps-npv-header: 64px; /* Spotify's now playing header height */
